@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Book a discovery call | GROVA</title>
+<meta name="description" content="Book a free 15-minute discovery call with GROVA and find out where your med spa is losing bookings." />
+<link rel="icon" type="image/svg+xml" href="assets/grova-G-green-transparent.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<script>document.documentElement.classList.add('js')</script>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-inner">
+    <a class="nav-logo" href="index.html" aria-label="GROVA home"><img src="assets/grova-wordmark-green.svg" alt="Grova." /></a>
+    <div class="nav-links">
+      <a class="keep" href="index.html">Back to home</a>
+    </div>
+  </div>
+</nav>
+
+<main class="book">
+  <div class="wrap book-grid">
+    <div>
+      <p class="eyebrow">Discovery call</p>
+      <h1>Let's find where your clinic is losing <em>bookings.</em></h1>
+      <p class="lead">A relaxed 15-minute video call. No pitch. We want to understand how your med spa works today and tell you honestly whether GROVA can help.</p>
+      <ul class="cover-list">
+        <li><span class="n">1</span><p>How a new inquiry becomes a booked client at your clinic today.</p></li>
+        <li><span class="n">2</span><p>Where you lose bookings: missed calls, no-shows or clients who never rebook.</p></li>
+        <li><span class="n">3</span><p>Which booking software you use, and where you want your diary to live.</p></li>
+        <li><span class="n">4</span><p>Whether a done-for-you system makes sense for you, and what it would involve.</p></li>
+      </ul>
+    </div>
+
+    <aside class="form-card">
+      <h2>Pick a time that suits you</h2>
+      <p class="sub">A video call on Zoom or Google Meet. Times show in your own time zone.</p>
+      <a class="btn light" id="calendly" href="https://calendly.com/grovasystems/15mins" target="_blank" rel="noopener">Choose a time</a>
+
+      <p class="or">or send a message</p>
+
+      <form id="contact-form">
+        <div class="field"><input type="text" name="name" placeholder="Your name" required /></div>
+        <div class="field"><input type="email" name="email" placeholder="Email" required /></div>
+        <div class="field"><input type="text" name="business_name" placeholder="Med spa name" /></div>
+        <div class="field">
+          <select name="video_platform" aria-label="Preferred video platform">
+            <option value="">Preferred video platform</option>
+            <option>Zoom</option>
+            <option>Google Meet</option>
+          </select>
+        </div>
+        <div class="field"><textarea name="message" placeholder="Anything you'd like us to know (optional)"></textarea></div>
+        <button class="btn light" type="submit" style="background:transparent;color:var(--cream);">Send message</button>
+        <p class="status" id="status" role="status"></p>
+      </form>
+    </aside>
+  </div>
+  <div class="wrap">
+    <div class="book-img"><img src="assets/images/facial-soft.jpg" alt="" loading="lazy" data-parallax /></div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <img src="assets/grova-wordmark-cream.svg" alt="Grova." />
+    <small>&copy; <span id="yr">2026</span> GROVA. Client retention for med spas.</small>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Same Google Sheet connector as the previous site
+  var GROVA_SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbykgVKS3wBSK1zUf6XFCDpu8iBi4UQC9FA9S51uCrNPZC596gGL3AzstrykTv9JxbSb/exec";
+
+  document.getElementById('contact-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var form = e.target;
+    var status = document.getElementById('status');
+    var btn = form.querySelector('button');
+    var platform = form.video_platform.value;
+
+    var data = new FormData();
+    data.append('source', 'book-a-call');
+    data.append('name', form.name.value);
+    data.append('email', form.email.value);
+    data.append('business_name', form.business_name.value);
+    // The sheet has an "Interested In" column; the preferred video platform goes there
+    data.append('interested_in', platform ? 'Video call: ' + platform : '');
+    data.append('message', form.message.value);
+
+    btn.disabled = true;
+    status.textContent = 'Sending...';
+    fetch(GROVA_SHEET_ENDPOINT, { method: 'POST', mode: 'no-cors', body: data })
+      .then(function () {
+        form.reset();
+        status.textContent = 'Thank you. We will be in touch within one working day.';
+        btn.disabled = false;
+      })
+      .catch(function () {
+        status.textContent = 'Something went wrong. Please try again.';
+        btn.disabled = false;
+      });
+  });
+</script>
+<script src="site.js" defer></script>
+</body>
+</html>
